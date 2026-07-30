@@ -50,7 +50,7 @@ jobs:
           github_token: ${{secrets.GITHUB_TOKEN}}
           workflow_search: true
           repo: osm-bg/qa-atp-osm
-          path: ./static/atp-osm/data
+          path: ./src/data/atp-osm
 
       - name: Download qa-waste-containers artifact
         uses: dawidd6/action-download-artifact@v21

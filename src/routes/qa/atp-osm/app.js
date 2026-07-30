@@ -3,7 +3,8 @@ import { make_osm_link } from '$lib/js/utils.js';
 import { onMount } from 'svelte';
 
 export function load_data() {
-	return fetch(`/qa/atp-osm/data/metadata.json`)
+	const url = new URL('/src/data/atp-osm/metadata.json', import.meta.url);
+	return fetch(url)
 	.then(res => res.json())
 	.then(data => data.list.sort((a, b) => a.spider_name.localeCompare(b.spider_name) || a.key.localeCompare(b.key)  || a.value.localeCompare(b.value)))
 	.then(data => {

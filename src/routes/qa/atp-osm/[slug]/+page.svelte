@@ -144,7 +144,7 @@
         }
         const spider = $page.params.slug;
 
-        const data = await fetch(new URL(`/static/atp-osm/data/${spider}.json`, import.meta.url));
+        const data = await fetch(new URL(`/src/data/atp-osm/${spider}.json`, import.meta.url));
         spider_data = await data.json();
         spider_data.items = spider_data.items.sort((a, b) => (a.dist >= 0 ? a.dist : +Infinity) - (b.dist >= 0 ? b.dist : +Infinity));
 
