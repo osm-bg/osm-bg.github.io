@@ -1,12 +1,12 @@
 <script>
     import Title from "/src/components/Title.svelte";
     import MapView from "/src/components/MapView.svelte";
-    import RoadNetworkRoadBtn from "../../components/RoadNetworkRoadBtn.svelte";
+    import RoadNetworkRoadBtn from "/src/components/RoadNetworkRoadBtn.svelte";
     import { onMount } from "svelte";
     import L from 'leaflet';
     import { decode } from 'google-polyline';
     import { SvelteSet } from 'svelte/reactivity';
-    import LastUpdate from "../../components/LastUpdate.svelte";
+    import LastUpdate from "/src/components/LastUpdate.svelte";
     import { routes_map } from '$data/road-routes/routes-map.js';
 
     let mapComponent;

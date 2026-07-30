@@ -1,5 +1,4 @@
 <script>
-    import { base } from '$app/paths';
     export let spider_data = {};
     export let show_kv_instead_of_name = false;
     const {spider_name, key, value} = spider_data;
@@ -10,7 +9,7 @@
         {#if show_kv_instead_of_name}
             {key}={value}
         {:else}
-            <a href="{base}/atp-osm/{key}-{value}-{spider_name}">
+            <a href="/qa/atp-osm/{key}-{value}-{spider_name}">
                 {spider_data.name}
             </a>
         {/if}

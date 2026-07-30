@@ -1,11 +1,11 @@
 <script>
     import Title from '/src/components/Title.svelte';
     import MapView from '/src/components/MapView.svelte';
-    import MotorwayMilestonePopup from '../../components/MotorwayMilestonePopup.svelte';
+    import MotorwayMilestonePopup from '/src/components/MotorwayMilestonePopup.svelte';
     import { mount } from 'svelte';
     import { onMount } from 'svelte';
     import L from 'leaflet';
-    import LastUpdate from '../../components/LastUpdate.svelte';
+    import LastUpdate from '/src/components/LastUpdate.svelte';
     
     let motorways = [];
     const layer_100 = new L.LayerGroup();
@@ -17,7 +17,7 @@
     let last_update_date = null;
     onMount(async () => {
         const map = mapComponent.get_map();
-        const data = await fetch(new URL('./milestones-data.json', import.meta.url).href)
+        const data = await fetch(new URL('/src/data/motorway-milestones/milestones.json', import.meta.url).href)
         .then(res => res.json());
         last_update_date = data.date;
         motorways = data.data;

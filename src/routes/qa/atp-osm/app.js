@@ -1,10 +1,9 @@
 // import { markerClusterGroup } from 'leaflet.markercluster';
-import { base } from '$app/paths';
 import { make_osm_link } from '$lib/js/utils.js';
 import { onMount } from 'svelte';
 
 export function load_data() {
-	return fetch(`${base}/atp-osm/data/metadata.json`)
+	return fetch(`/qa/atp-osm/data/metadata.json`)
 	.then(res => res.json())
 	.then(data => data.list.sort((a, b) => a.spider_name.localeCompare(b.spider_name) || a.key.localeCompare(b.key)  || a.value.localeCompare(b.value)))
 	.then(data => {

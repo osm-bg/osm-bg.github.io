@@ -3,5 +3,5 @@
 </script>
 
 <svelte:head>
-    <title>{title ? title + ' - ' : ''}Инструменти за OSM:BG</title>
+    <title>{title ? title + ' - ' : ''}OpenStreetMap България</title>
 </svelte:head>

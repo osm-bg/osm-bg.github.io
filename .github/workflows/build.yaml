@@ -29,7 +29,7 @@ jobs:
           github_token: ${{secrets.GITHUB_TOKEN}}
           workflow_search: true
           repo: osm-bg/qa-motorway-milestones
-          path: ./src/routes/motorway-milestones
+          path: ./src/data/motorway-milestones
         
       - name: Make data directory
         run: mkdir -p ./src/data
@@ -59,7 +59,7 @@ jobs:
           github_token: ${{secrets.GITHUB_TOKEN}}
           workflow_search: true
           repo: osm-bg/qa-waste-containers
-          path: ./src/routes/waste-containers
+          path: ./src/routes/qa/waste-containers
 
       - name: Set up Node.js
         uses: actions/setup-node@v4

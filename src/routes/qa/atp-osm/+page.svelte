@@ -4,8 +4,7 @@
     import { onMount } from 'svelte';
     import ATPTable from '/src/components/ATPTable.svelte';
     import ATPLegend from '/src/components/ATPLegend.svelte';
-    import { base } from '$app/paths';
-    import LastUpdate from '../../components/LastUpdate.svelte';
+    import LastUpdate from '/src/components/LastUpdate.svelte';
 
     let groups = [];
     let last_update_date;

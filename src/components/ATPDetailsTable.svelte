@@ -67,6 +67,18 @@
                     {:else}
                         <td colspan="3">Няма данни за сравнение</td>
                     {/if}
+                    <td>
+                        {#if osm}
+                            <button 
+                                class="btn btn-sm btn-secondary"
+                                onclick={navigator.clipboard.writeText('\n\n' + compare_keys.map((k) => `${k}=${atp.tags[k]}`).join('\n'))}>Копирай таговете</button>
+                            <a href={`https://www.openstreetmap.org/${osm.type}/${osm.id}`} target="_blank" class="btn btn-sm btn-primary text-white">OSM</a>
+                            <a href={`https://www.openstreetmap.org/edit?editor=id&${osm.type}=${osm.id}`} target="_blank" class="btn btn-sm btn-primary text-white">iD</a>
+                        {:else}
+                            <a href={`https://www.openstreetmap.org/#map=19/${atp.coordinates[0]}/${atp.coordinates[1]}`} target="_blank" class="btn btn-sm btn-primary text-white">Покажи в OSM</a>
+                            <a href={`https://www.openstreetmap.org/edit?editor=id#map=19/${atp.coordinates[0]}/${atp.coordinates[1]}`} target="_blank" class="btn btn-sm btn-primary text-white">Покажи в iD</a>
+                        {/if}
+                    </td>
                 </tr>
                 {#if compare_keys && compare_keys.length > 1}
                     {#each compare_keys as compare_key, index}

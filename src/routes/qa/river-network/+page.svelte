@@ -1,28 +1,29 @@
 <script>
     import Title from "/src/components/Title.svelte";
     import MapView from "/src/components/MapView.svelte";
-    import RoadNetworkRoadBtn from "../../components/RoadNetworkRoadBtn.svelte";
+    import RoadNetworkRoadBtn from "/src/components/RoadNetworkRoadBtn.svelte";
     import { onMount } from "svelte";
     import L from 'leaflet';
     import { decode } from 'google-polyline';
     import { SvelteSet } from 'svelte/reactivity';
-    import LastUpdate from "../../components/LastUpdate.svelte";
-    import { routes_map } from '$data/railway-routes/routes-map.js';
+    import LastUpdate from "/src/components/LastUpdate.svelte";
+    import { rivers_map } from '$data/rivers/rivers-map.js';
 
     let mapComponent;
     const shown_routes = new SvelteSet();
 
     async function toggle_route_visibility(route) {
         const map = mapComponent.get_map();
-        console.log(`Toggling route ${route.ref}`);
-        if(shown_routes.has(route.ref)) {
-            shown_routes.delete(route.ref);
+        console.log(`Toggling route ${route.name}`);
+        const key = route.name;
+        if(shown_routes.has(key)) {
+            shown_routes.delete(key);
             map.removeLayer(route.layer);
         }
         else {
-            shown_routes.add(route.ref);
+            shown_routes.add(route.name);
             if(!route.layer) {
-                const route_req = await fetch(routes_map.get(route.ref.toString()));
+                const route_req = await fetch(rivers_map.get(key));
                 const route_data = await route_req.json();
                 const encoded_polylines = route_data.polylines;
                 const decoded_features = encoded_polylines.map(encoded => {
@@ -83,22 +84,17 @@
     let last_update_date = null;
     onMount(async () => {
         const map = mapComponent.get_map();
-        const req = await fetch(new URL('$data/railway-routes/routes.json', import.meta.url));
+        const req = await fetch(new URL('$data/rivers/rivers.json', import.meta.url));
         const data = await req.json();
         routes = data.data;
         last_update_date = data.date;
         routes.sort((a, b) => {
-            if(typeof a.ref === 'number' && typeof b.ref === 'number') {
-                return a.ref - b.ref;
-            }
-            const a_ref = typeof a.ref === 'number' ? a.ref : parseInt(a.ref.replace(/\D/g, ''));
-            const b_ref = typeof b.ref === 'number' ? b.ref : parseInt(b.ref.replace(/\D/g, ''));
-            return a_ref - b_ref;
+            return a.name.localeCompare(b.name, 'bg', {numeric: true});
         });
     });
 </script>
 
-<Title title="Железопътна мрежа" />
+<Title title="Речна мрежа" />
 
 <div class="row">
     <div class="col col-12 col-md-4">
@@ -106,9 +102,9 @@
             <tbody data-skip-search="true">
                 <tr class="table-primary">
                     <td>
-                        <input class="form-control" type="text" placeholder="Търсене на път..." on:input="{filter_routes}" id="search-input"/>
+                        <input class="form-control" type="text" placeholder="Търсене на река..." on:input="{filter_routes}" id="search-input"/>
                         <input type="checkbox" id="only-shown" on:change="{filter_routes}"/>
-                        <label for="only-shown">Покажи само видимите пътища на картата</label>
+                        <label for="only-shown">Покажи само видимите реки на картата</label>
                     </td>
                 </tr>
             </tbody>
@@ -116,7 +112,7 @@
                 <tr>
                     <td>
                         {#each routes as route}
-                        <RoadNetworkRoadBtn route={route} is_shown={shown_routes.has(route.ref)} label={route.ref} on:click={() => toggle_route_visibility(route)} />
+                        <RoadNetworkRoadBtn route={route} is_shown={shown_routes.has(route.name)} label={route.name} on:click={() => toggle_route_visibility(route)} />
                         {/each}
                     </td>
                 </tr>

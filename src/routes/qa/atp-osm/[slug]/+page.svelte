@@ -13,7 +13,7 @@
     import MapView from '/src/components/MapView.svelte';
     import ATPPopup from '/src/components/ATPPopup.svelte';
     import { SvelteMap, SvelteSet } from 'svelte/reactivity';
-    import LastUpdate from '../../../components/LastUpdate.svelte';
+    import LastUpdate from '/src/components/LastUpdate.svelte';
     let spider_data = $state(null);
     let last_update_date = $derived(spider_data?.metadata?.date);
     let spider_items = $derived(spider_data?.items || []);
@@ -27,10 +27,10 @@
         same: 0
     });
     let checked = $state({
-        atp_only: true,
-        osm_only: true,
+        atp_only: false,
+        osm_only: false,
         different: true,
-        same: true
+        same: false
     });
     let cluster = null;
 
@@ -144,7 +144,7 @@
         }
         const spider = $page.params.slug;
 
-        const data = await fetch(new URL(`../../../../static/atp-osm/data/${spider}.json`, import.meta.url));
+        const data = await fetch(new URL(`/static/atp-osm/data/${spider}.json`, import.meta.url));
         spider_data = await data.json();
         spider_data.items = spider_data.items.sort((a, b) => (a.dist >= 0 ? a.dist : +Infinity) - (b.dist >= 0 ? b.dist : +Infinity));
 
