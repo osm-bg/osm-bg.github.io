@@ -1,4 +1,4 @@
-name: Build milestones data and upload as artifact
+name: Build milestones data
 
 on:
   workflow_dispatch:
