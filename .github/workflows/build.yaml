@@ -22,6 +22,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      - name: Make data directory
+        run: mkdir -p src/data/
+
       - name: Download milestones artifact
         uses: dawidd6/action-download-artifact@v21
         with:
@@ -29,10 +32,7 @@ jobs:
           github_token: ${{secrets.GITHUB_TOKEN}}
           workflow_search: true
           repo: osm-bg/osm-bg.github.io
-          path: ./src/data/milestones
-        
-      - name: Make data directory
-        run: mkdir -p ./src/data
+          path: src/data/milestones/
 
       - name: Download qa-road-network artifact
         uses: dawidd6/action-download-artifact@v21
@@ -41,7 +41,7 @@ jobs:
           github_token: ${{secrets.GITHUB_TOKEN}}
           workflow_search: true
           repo: osm-bg/qa-road-network
-          path: ./src/data
+          path: src/data/
 
       - name: Download qa-atp-osm artifact
         uses: dawidd6/action-download-artifact@v21
@@ -50,7 +50,7 @@ jobs:
           github_token: ${{secrets.GITHUB_TOKEN}}
           workflow_search: true
           repo: osm-bg/qa-atp-osm
-          path: ./src/data/atp-osm
+          path: src/data/atp-osm
 
       - name: Download qa-waste-containers artifact
         uses: dawidd6/action-download-artifact@v21
@@ -59,7 +59,7 @@ jobs:
           github_token: ${{secrets.GITHUB_TOKEN}}
           workflow_search: true
           repo: osm-bg/qa-waste-containers
-          path: ./src/routes/qa/waste-containers
+          path: src/routes/qa/waste-containers
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
