@@ -1,0 +1,28 @@
+name: Build milestones data and upload as artifact
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 0' # Every Sunday at midnight
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run build script
+        run: npm run build-milestones
+
+      - name: Upload milestones artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: milestones
+          path: /src/data/milestones/data.json

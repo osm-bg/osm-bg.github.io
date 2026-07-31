@@ -20,16 +20,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
-      - name: Download qa-motorway-milestones artifact
+      - name: Download milestones artifact
         uses: dawidd6/action-download-artifact@v21
         with:
-          name: milestones-data
+          name: milestones
           github_token: ${{secrets.GITHUB_TOKEN}}
           workflow_search: true
-          repo: osm-bg/qa-motorway-milestones
-          path: ./src/data/motorway-milestones
+          repo: osm-bg/osm-bg.github.io
+          path: ./src/data/milestones
         
       - name: Make data directory
         run: mkdir -p ./src/data
