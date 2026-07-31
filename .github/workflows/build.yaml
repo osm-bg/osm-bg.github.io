@@ -30,8 +30,7 @@ jobs:
         with:
           name: milestones
           github_token: ${{secrets.GITHUB_TOKEN}}
-          workflow_search: true
-          repo: osm-bg/osm-bg.github.io
+          workflow: milestones.yaml
           path: src/data/milestones/
 
       - name: Download qa-road-network artifact
