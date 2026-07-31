@@ -8,84 +8,81 @@
     import LastUpdate from '/src/components/LastUpdate.svelte';
     
     let motorways = [];
-    const layer_100 = new L.LayerGroup();
-    const layer_50 = new L.LayerGroup();
-    const layer_10 = new L.LayerGroup();
-    const layer_5 = new L.LayerGroup();
-    const layer_all = new L.LayerGroup();
+
+    const LAYERS = [
+        { minZoom: 7,  mod: 100, layer: new L.LayerGroup() },
+        { minZoom: 8,  mod: 50,  layer: new L.LayerGroup() },
+        { minZoom: 9,  mod: 10,  layer: new L.LayerGroup() },
+        { minZoom: 11, mod: 5,   layer: new L.LayerGroup() },
+        { minZoom: 13, mod: 1,   layer: new L.LayerGroup() }
+    ];
+
     let mapComponent = null;
-    let last_update_date = null;
+    let lastUpdateDate = null;
     onMount(async () => {
         const map = mapComponent.get_map();
-        const data = await fetch(new URL('/src/data/motorway-milestones/milestones.json', import.meta.url).href)
-        .then(res => res.json());
-        last_update_date = data.date;
+        const response = await fetch(new URL('/src/data/milestones/data.json', import.meta.url));
+        const data = await response.json();
+        lastUpdateDate = data.pointInTime;
         motorways = data.data;
-        console.log('milestones_data promise:', motorways);
         for(const motorway of motorways) {
-            console.log(motorway);
-
-            if(motorway.warnings.milestones.length) {
-                for(const marker_data of motorway.warnings.milestones) {
-                    const marker = L.marker(marker_data.coords);
-                    let colour = 'danger';
-                    if(marker_data.suspicious) {
-                        colour = 'warning';
-                    }
-                    else if(marker_data.double) {
-                        colour = 'success';
-                    }
-                    marker.setIcon(get_div_icon_with_number(marker_data.distance, colour));
-                    const container = document.createElement('div');
-                    console.log(marker_data);
-                    const destroy = mount(MotorwayMilestonePopup, {
-                        target: container,
-                        props: { ids: typeof marker_data.osm_id === 'string' ? marker_data.osm_id.split(';') : [marker_data.osm_id], distance: marker_data.distance, motorway: motorway.name }
-                    });
-                    container._destroy = destroy;
-                    marker.bindPopup(container);
-                    const distance = marker_data.distance;
-                    if(distance % 10 === 0) {
-                        if(distance % 100 === 0) {
-                            marker.addTo(layer_100);
-                        }
-                        else if(distance % 50 === 0) {
-                            marker.addTo(layer_50);
-                        }
-                        else {
-                            marker.addTo(layer_10);
-                        }
-                    }
-                    else if(distance % 5 === 0) {
-                        marker.addTo(layer_5);
-                    }
-                    else {
-                        marker.addTo(layer_all);
-                    }
+            for(const marker_data of motorway.milestones) {
+                const mapMarker = L.marker(marker_data.coords);
+                let colour = 'danger';
+                if(marker_data.fixme) {
+                    colour = 'warning';
                 }
+                else if(marker_data.double) {
+                    colour = 'success';
+                }
+                mapMarker.setIcon(get_div_icon_with_number(marker_data.distance, colour));
+                
+                // popup
+                const container = document.createElement('div');
+                const destroy = mount(MotorwayMilestonePopup, {
+                    target: container,
+                    props: { marker: marker_data, motorway: motorway.name }
+                });
+                container._destroy = destroy;
+                mapMarker.bindPopup(container);
+
+                // grouping
+                const distance = marker_data.distance;
+                const match = LAYERS.find(cfg => distance % cfg.mod === 0) || LAYERS.at(-1);
+                mapMarker.addTo(match.layer);
             }
         }
-        map.on('zoom', () => {
-            toggle_layers(layer_100, layer_50, layer_10, layer_5, layer_all);
-        });
-        toggle_layers(layer_100, layer_50, layer_10, layer_5, layer_all);
-        function toggle_layers(layer_100, layer_50, layer_10, layer_5, layer_all) {
-            const toggleLayer = function(map, layer, show) {
-                if(show && !map.hasLayer(layer)) {
+        map.on('zoom', updateLayers);
+        function updateLayers() {
+            const zoom = map.getZoom();
+            LAYERS.forEach(({ minZoom, layer }) => {
+                if (zoom >= minZoom && !map.hasLayer(layer)) {
                     map.addLayer(layer);
                 }
-                else if(!show && map.hasLayer(layer)) {
+                else if (zoom < minZoom && map.hasLayer(layer)) {
                     map.removeLayer(layer);
                 }
-            };
-            const zoom = map.getZoom();
-            toggleLayer(map, layer_100, zoom >= 7);
-            toggleLayer(map, layer_50, zoom >= 8);
-            toggleLayer(map, layer_10, zoom >= 9);
-            toggleLayer(map, layer_5, zoom >= 11);
-            toggleLayer(map, layer_all, zoom >= 13);
+            });
         }
+        updateLayers();
     });
+
+    function findMissingMilestones(motorway, milestones) {
+        const all = new Set();
+        for (const range of motorway.validRanges) {
+            for (let i = range.start; i <= range.end; i++) {
+                all.add(i);
+            }
+        }
+        const present = new Set(milestones.map(m => m.distance));
+        const missing = all.symmetricDifference(present);
+
+        const missingArray = Array.from(missing).sort((a, b) => a - b);
+        const missingRanges = reduce_array_to_ranges(missingArray);
+        console.log(missingRanges)
+        return missingRanges;
+    }
+
     function reduce_array_to_ranges(array) {
         const ranges = [];
         let start = array[0];
@@ -122,14 +119,14 @@
 <Title title="Километрични маркери"/>
 
 <MapView bind:this={mapComponent} startZoom={8} minZoom={7} height="700px"/>
-<LastUpdate date={last_update_date} />
+<LastUpdate date={lastUpdateDate} />
 <div class="row">
     <div class="col-8">
         <table class="table table-sm">
             <thead>
                 <tr class="table-secondary">
                     <th>Автомагистрала</th>
-                    <th>Налични</th>
+                    <th>Километри по официални данни</th>
                     <th>Липсващи</th>
                 </tr>
             </thead>
@@ -137,8 +134,8 @@
                 {#each motorways as motorway}
                 <tr>
                     <td>{motorway.name}</td>
-                    <td>{motorway.ranges.map(([start, end]) => `${start} - ${end}`).join(', ')}</td>
-                    <td>{reduce_array_to_ranges(motorway.warnings.missing).map((range) => range.length==2?`${range[0]} - ${range[1]}`:range).join(', ')}</td>
+                    <td>{motorway.validRanges.map(({ start, end }) => `${start} - ${end}`).join(', ')}</td>
+                    <td>{findMissingMilestones(motorway, motorway.milestones).map((range) => range.length==2?`${range[0]} - ${range[1]}`:range).join(', ')}</td>
                 </tr>
                 {/each}
             </tbody>

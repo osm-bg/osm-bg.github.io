@@ -21,10 +21,11 @@ function distance(coords1: [number, number], coords2: [number, number], options:
 
 type Milestone = {
     osmType: 'node';
-    osmId: number;
+    osmIds: number[];
     distance: number;
     coords: [number, number];
     double?: boolean;
+    fixme?: string;
 };
 
 type RoadWithMilestones = {
@@ -51,17 +52,27 @@ rel[route=road][network="bg:motorway"](area.searchArea);
     return queryOverpass(query);
 }
 
-function preprocessMilestones(milestones) {
+function preprocessMilestones(milestones): Milestone[] {
+    const numberRegex = /^\d+$/;
     return milestones.map((milestone) => {
+        const isDistanceValid = milestone.tags.distance && numberRegex.test(milestone.tags.distance);
+        if (!isDistanceValid) {
+            console.warn(`Milestone with id ${milestone.id} has invalid distance: ${milestone.tags.distance}`);
+            return null;
+        }
         const distance = parseFloat(milestone.tags.distance);
         const coords = [milestone.lat, milestone.lon] as [number, number];
-        return {
+        const toReturn: Milestone = {
             osmType: milestone.type,
-            osmId: milestone.id,
+            osmIds: [milestone.id],
             distance,
-            coords
+            coords,
         };
-    });
+        if (milestone.tags.fixme) {
+            toReturn.fixme = milestone.tags.fixme;
+        }
+        return toReturn;
+    }).filter((v): v is Milestone => !!v);
 }
 
 function mergeCloseMilestones(milestones: Milestone[]) {
@@ -82,7 +93,13 @@ function mergeCloseMilestones(milestones: Milestone[]) {
                 (coords1[0] + coords2[0]) / 2,
                 (coords1[1] + coords2[1]) / 2
             ];
-            match.osmId += `;${current.osmId}`;
+            match.osmIds.push(current.osmIds[0]);
+            if (current.fixme && !match.fixme) {
+                match.fixme = current.fixme;
+            }
+            if (current.fixme && match.fixme && current.fixme !== match.fixme) {
+                match.fixme = `${current.fixme};${match.fixme}`;
+            }
             milestones.splice(i, 1);
         }
         else {
@@ -152,7 +169,7 @@ async function run() {
         delete motorway.milestonesFromRelation;
     }
 
-    const outDir = 'src/data/milestones';
+    const outDir = './src/data/milestones';
     if (!fs.existsSync(outDir)) {
         fs.mkdirSync(outDir, { recursive: true });
     }
