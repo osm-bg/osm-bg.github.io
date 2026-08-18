@@ -36,6 +36,13 @@
             title: "Контейнери за отпадъци",
             text: "Инструмент за визуализация и проверка на данни за контейнери за отпадъци в OpenStreetMap.",
             link: "./waste-containers/"
+        },
+        {
+            emoji: "🏛️",
+            isNew: true,
+            title: "Интеграция на данни от Регионален исторически музей - София",
+            text: "Инструмент за сравнение на данните в OpenStreetMap и на данните от Регионален исторически музей - София.",
+            link: "./rhm-sofia/"
         }
     ]
 </script>
@@ -48,7 +55,7 @@
             <div class="">
                 <div class="card" style="width: 18rem;">
                     <div class="card-body">
-                        <h5 class="card-title">{card.emoji} {card.title}</h5>
+                        <h5 class="card-title"><span class="badge bg-danger" class:d-none={!card.isNew}>Ново!</span>{card.emoji} {card.title}</h5>
                         <p class="card-text">{card.text}</p>
                         <a href={card.link} class="btn btn-outline-primary">Към инструмента</a>
                     </div>
