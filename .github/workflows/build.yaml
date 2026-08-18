@@ -60,6 +60,14 @@ jobs:
           repo: osm-bg/qa-waste-containers
           path: src/routes/qa/waste-containers
 
+      - name: Download rhm-sofia artifact
+        uses: dawidd6/action-download-artifact@v21
+        with:
+          name: rhm-sofia-data
+          github_token: ${{secrets.GITHUB_TOKEN}}
+          workflow: rhm-sofia.yaml
+          repo: osm-bg/osm-bg.github.io
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
 
