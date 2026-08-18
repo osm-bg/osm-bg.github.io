@@ -10,9 +10,10 @@
 	export let maxZoom = 18;
 	export let height = "400px";
 	export let enableLocateControl = true;
+	export let center = [42.740, 25.450];
 
 	onMount(async () => {
-		map = L.map('map').setView([42.740, 25.450], startZoom);
+		map = L.map('map').setView(center, startZoom);
 
 		L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
 			minZoom: minZoom,
