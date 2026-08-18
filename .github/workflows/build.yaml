@@ -66,7 +66,7 @@ jobs:
           name: rhm-sofia-data
           github_token: ${{secrets.GITHUB_TOKEN}}
           workflow: rhm-sofia.yaml
-          repo: osm-bg/osm-bg.github.io
+          path: src/data/rhm-sofia/
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
