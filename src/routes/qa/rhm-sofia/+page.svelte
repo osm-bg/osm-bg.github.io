@@ -85,32 +85,42 @@
                     continue;
                 }
                 const matchType = matchElements(osmFeature, officialFeature);
-                if (matchType) {
+                if (!matchType) {
+                    continue;
+                }
+                matches.push({
+                    osm: osmFeature,
+                    official: officialFeature,
+                    matchType: matchType
+                });
+                osmFeature.matched = true;
+                officialFeature.properties.matched = true;
+                continue outer;
+            }
+        }
+        outer:
+        for (const osmFeature of osmData) {
+            if (osmFeature.matched) {
+                continue;
+            }
+            for (const officialFeature of officialData) {
+                if (officialFeature.properties.matched) {
+                    continue;
+                }
+                const distance = Math.sqrt(
+                    Math.pow(osmFeature.lat - officialFeature.geometry.coordinates[1], 2) +
+                    Math.pow(osmFeature.lon - officialFeature.geometry.coordinates[0], 2)
+                );
+                const distanceInMeters = distance * 111139; // Approximate conversion from degrees to meters
+                if (distanceInMeters < 20) {
                     matches.push({
                         osm: osmFeature,
                         official: officialFeature,
-                        matchType: matchType
+                        matchType: 'distance'
                     });
                     osmFeature.matched = true;
                     officialFeature.properties.matched = true;
                     continue outer;
-                }
-                else {
-                    const distance = Math.sqrt(
-                        Math.pow(osmFeature.lat - officialFeature.geometry.coordinates[1], 2) +
-                        Math.pow(osmFeature.lon - officialFeature.geometry.coordinates[0], 2)
-                    );
-                    const distanceInMeters = distance * 111139; // Approximate conversion from degrees to meters
-                    if (distanceInMeters < 20) {
-                        matches.push({
-                            osm: osmFeature,
-                            official: officialFeature,
-                            matchType: 'distance'
-                        });
-                        osmFeature.matched = true;
-                        officialFeature.properties.matched = true;
-                        continue outer;
-                    }
                 }
             }
         }
