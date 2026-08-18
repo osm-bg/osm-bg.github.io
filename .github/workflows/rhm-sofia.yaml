@@ -3,7 +3,7 @@ name: Build RHM Sofia data
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * 0' # Every Sunday at midnight
+    - cron: '55 8-22/2 * * *' # At minute 55 past every 2nd hour from 8 through 22
 
 jobs:
   build:
