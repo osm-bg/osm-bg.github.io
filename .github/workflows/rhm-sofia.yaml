@@ -24,4 +24,5 @@ jobs:
       - name: Upload rhm-sofia artifact
         uses: actions/upload-artifact@v7
         with:
+          name: rhm-sofia-data
           path: src/data/rhm-sofia/osm-data.json

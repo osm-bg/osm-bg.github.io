@@ -63,6 +63,7 @@ jobs:
       - name: Download rhm-sofia artifact
         uses: dawidd6/action-download-artifact@v21
         with:
+          name: rhm-sofia-data
           github_token: ${{secrets.GITHUB_TOKEN}}
           workflow: rhm-sofia.yaml
           path: src/data/rhm-sofia/
