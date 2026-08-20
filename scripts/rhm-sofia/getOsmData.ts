@@ -17,6 +17,18 @@ function getData() {
 
 function parseData(data: any) {
     console.log(`Found ${data.length} artworks, memorials, monuments and rhm_sofia references`);
+    const relations = data.filter((element: any) => element.type === 'relation');
+    for (const relation of relations) {
+        const members = relation.members || [];
+        for (const member of members) {
+            if (member.type === 'node' || member.type === 'way') {
+                const elementIndex = data.findIndex((element: any) => element.type === member.type && element.id === member.ref);
+                if (elementIndex !== -1) {
+                    data.splice(elementIndex, 1);
+                }
+            }
+        }
+    }
     return data.map((element: any) => {
         const name = element.tags.name;
         const lat = element.lat || (element.center && element.center.lat);
