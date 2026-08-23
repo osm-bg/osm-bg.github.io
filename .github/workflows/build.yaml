@@ -28,7 +28,6 @@ jobs:
       - name: Download milestones artifact
         uses: dawidd6/action-download-artifact@v21
         with:
-          name: milestones
           github_token: ${{secrets.GITHUB_TOKEN}}
           workflow: milestones.yaml
           path: src/data/milestones/
