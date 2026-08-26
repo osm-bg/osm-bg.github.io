@@ -9,27 +9,54 @@
             label: 'Full Match (WD & RHM & OSM)',
             count: 0,
             colour: '#2E7D32',      // Verified Match (Green)
+            isShown: true,
+            group: new L.LayerGroup(),
         },
         'partial_match': {
             label: 'Match Candidate',
             count: 0,
-            colour: '#ED6C02',   // Needs Attention (Amber)
+            colour: '#D32F2F',   // Needs Attention (Amber)
+            isShown: true,
+            group: new L.LayerGroup(),
         },
         'not_on_osm': {
             label: 'RHM & WD not OSM',
             count: 0,
             colour: '#0284C7',      // OSM Gap / To Add (Blue)
+            isShown: true,
+            group: new L.LayerGroup(),
         },
         'not_on_official': {
             label: 'OSM & WD not RHM',
             count: 0,
             colour: '#7B1FA2', // Unofficial / Local Only (Purple)
+            isShown: true,
+            group: new L.LayerGroup(),
         },
         'no_match': {
             label: 'OSM only',
             count: 0,
-            colour: '#D32F2F',        // Unmatched / Error (Red)
+            colour: '#ED6C02',        // Unmatched / Error (Red)
+            isShown: true,
+            group: new L.LayerGroup(),
         }
+    });
+    $effect(() => {
+        if (!mapComponent) return;
+        const map = mapComponent.get_map();
+        if (!map) return;
+
+        Object.values(colours).forEach(item => {
+            if (item.isShown) {
+                if (!map.hasLayer(item.group)) {
+                    item.group.addTo(map);
+                }
+            } else {
+                if (map.hasLayer(item.group)) {
+                    map.removeLayer(item.group);
+                }
+            }
+        });
     });
     function addMapMarker(match, map) {
         let colour = colours.no_match;
@@ -66,7 +93,7 @@
                 iconAnchor: [6, 6],
             }),
         });
-        marker.addTo(map);
+        colour.group.addLayer(marker);
         const popupContent = `
             <div>
                 <strong>OSM:</strong> ${match.osm?.name || 'N/A'}<br>
@@ -174,7 +201,6 @@
     }
     let matches: any[] = $state([]);
     onMount(async () => {
-        const map = mapComponent.get_map();
         const osmResponse = await fetch(new URL('/src/data/rhm-sofia/osm-data.json', import.meta.url));
         const osmData = await osmResponse.json();
 
@@ -202,6 +228,7 @@
                     <th colspan="3">Легенда</th>
                 </tr>
                 <tr>
+                    <th> </th>
                     <th>Цвят</th>
                     <th>Значение</th>
                     <th>Брой</th>
@@ -210,6 +237,7 @@
             <tbody>
                 {#each Object.entries(colours) as [key, value]}
                     <tr>
+                        <td><input type="checkbox" bind:checked={value.isShown}></td>
                         <td><div style="background-color: {value.colour}; width: 12px; height: 12px; border-radius: 50%;"></div></td>
                         <td>{value.label}</td>
                         <td>{value.count}</td>
