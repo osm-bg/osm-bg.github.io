@@ -4,20 +4,45 @@
 
     let mapComponent = null;
 
-    const colours = {
-        'full_match': '#2E7D32',      // Verified Match (Green)
-        'partial_match': '#ED6C02',   // Needs Attention (Amber)
-        'not_on_osm': '#0284C7',      // OSM Gap / To Add (Blue)
-        'not_on_official': '#7B1FA2', // Unofficial / Local Only (Purple)
-        'no_match': '#D32F2F',        // Unmatched / Error (Red)
-    };
+    const colours = $state({
+        'full_match': {
+            label: 'Full Match (WD & RHM & OSM)',
+            count: 0,
+            colour: '#2E7D32',      // Verified Match (Green)
+        },
+        'partial_match': {
+            label: 'Match Candidate',
+            count: 0,
+            colour: '#ED6C02',   // Needs Attention (Amber)
+        },
+        'not_on_osm': {
+            label: 'RHM & WD not OSM',
+            count: 0,
+            colour: '#0284C7',      // OSM Gap / To Add (Blue)
+        },
+        'not_on_official': {
+            label: 'OSM & WD not RHM',
+            count: 0,
+            colour: '#7B1FA2', // Unofficial / Local Only (Purple)
+        },
+        'no_match': {
+            label: 'OSM only',
+            count: 0,
+            colour: '#D32F2F',        // Unmatched / Error (Red)
+        }
+    });
     function addMapMarker(match, map) {
-        let colour = '';
+        let colour = colours.no_match;
         if (!match.osm && match.official) {
             colour = colours.not_on_osm;
         }
         else if (match.osm && !match.official) {
-            colour = colours.not_on_official;
+            if (match.osm.tags.wikidata) {
+                colour = colours.not_on_official;
+            }
+            else {
+                colour = colours.no_match;
+            }
         }
         else {
             if (match.osm.rhmId && match.official.properties.rhmId && match.osm.rhmId === match.official.properties.rhmId) {
@@ -30,11 +55,13 @@
                 colour = colours.partial_match;
             }
         }
+
+        colour.count += 1;
         
         const marker = L.marker([match.osm?.lat || match.official.geometry.coordinates[1], match.osm?.lon || match.official.geometry.coordinates[0]], {
             icon: L.divIcon({
                 className: 'custom-marker',
-                html: `<div style="background-color: ${colour}; width: 12px; height: 12px; border-radius: 50%;"></div>`,
+                html: `<div style="background-color: ${colour.colour}; width: 12px; height: 12px; border-radius: 50%;"></div>`,
                 iconSize: [12, 12],
                 iconAnchor: [6, 6],
             }),
@@ -43,7 +70,7 @@
         const popupContent = `
             <div>
                 <strong>OSM:</strong> ${match.osm?.name || 'N/A'}<br>
-                <strong>Official:</strong> ${match.official?.properties.xLabel || 'N/A'}<br>
+                <strong>RHM:</strong> ${match.official?.properties.xLabel || 'N/A'}<br>
                 <strong>Match Type:</strong> ${match.matchType || 'N/A'}<br>
                 ${match.official ? showTags(match.official.properties.rhmId || '', match.official.properties.wikidata || '') : ''}<br>
                 ${match.osm ? `<a href="https://www.openstreetmap.org/${match.osm.osmType}/${match.osm.osmId}" target="_blank">${match.osm.osmType}/${match.osm.osmId}</a>` : ''}
@@ -145,7 +172,7 @@
         }
         return matches;
     }
-    let matches: any[] = [];
+    let matches: any[] = $state([]);
     onMount(async () => {
         const map = mapComponent.get_map();
         const osmResponse = await fetch(new URL('/src/data/rhm-sofia/osm-data.json', import.meta.url));
@@ -164,55 +191,30 @@
 </script>
 
 <div class="row">
-    <div class="col-11">
+    <div class="col-10">
         <h2>Карта</h2>
         <MapView bind:this={mapComponent} height="700px" maxZoom={22} center={[42.697738, 23.321707]} startZoom={14}/>
     </div>
-    <div class="col-1">
+    <div class="col-2">
         <table class="table table-sm table-bordered text-center">
             <thead>
                 <tr>
-                    <th colspan="2">Легенда</th>
+                    <th colspan="3">Легенда</th>
                 </tr>
                 <tr>
                     <th>Цвят</th>
                     <th>Значение</th>
+                    <th>Брой</th>
                 </tr>
             </thead>
             <tbody>
                 {#each Object.entries(colours) as [key, value]}
                     <tr>
-                        <td><div style="background-color: {value}; width: 12px; height: 12px; border-radius: 50%;"></div></td>
-                        <td>{key.replace(/_/g, ' ')}</td>
+                        <td><div style="background-color: {value.colour}; width: 12px; height: 12px; border-radius: 50%;"></div></td>
+                        <td>{value.label}</td>
+                        <td>{value.count}</td>
                     </tr>
                 {/each}
-        </table>
-        <table class="table table-sm table-bordered text-center">
-            <tbody>
-                <tr>
-                    <th colspan="2">Статистика</th>
-                </tr>
-                <tr>
-                    <td>Метрика / Описание</td>
-                    <td>Брой обекти</td>
-                </tr>
-                <tr>
-                    <td>ОСМ</td>
-                    <td>{matches.filter(m => m.osm).length}</td>
-                </tr>
-                <tr>
-                    <td>Мачнати (всички)</td>
-                    <td>{matches.filter(m => m.osm && m.official).length}</td>
-                </tr>
-                <tr>
-                    <td>Мачнати (по УД/РИМ)</td>
-                    <td>{matches.filter(m => m.osm && m.official && m.matchType && (m.matchType.includes('wikidata') || m.matchType.includes('rhmId'))).length}</td>
-                </tr>
-                <tr>
-                    <td>Официално</td>
-                    <td>{matches.filter(m => m.official).length}</td>
-                </tr>
-            </tbody>
         </table>
     </div>
 </div>
@@ -221,7 +223,7 @@
     <thead>
         <tr>
             <th>OSM</th>
-            <th>Official</th>
+            <th>RHM</th>
             <th>Match</th>
         </tr>
     </thead>
