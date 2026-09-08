@@ -243,6 +243,10 @@
                         <td>{value.count}</td>
                     </tr>
                 {/each}
+                <tr>
+                    <td colspan="3"><strong>Общо</strong></td>
+                    <td><strong>{Object.values(colours).reduce((acc, curr) => acc + curr.count, 0)}</strong></td>
+                </tr>
         </table>
     </div>
 </div>
