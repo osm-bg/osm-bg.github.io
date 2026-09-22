@@ -1,5 +1,5 @@
 import fs from 'fs';
-import queryOverpass from '@derhuerst/query-overpass';
+import { queryOverpassWithCustomQuery } from '../utils.ts';
 
 const motorway_prefix = 'Автомагистрала';
 
@@ -22,10 +22,12 @@ function distance(coords1: [number, number], coords2: [number, number], options:
 type Milestone = {
     osmType: 'node';
     osmIds: number[];
-    distance: number;
+    tags: {
+        distance: string;
+        fixme?: string;
+        double: boolean;
+    };
     coords: [number, number];
-    double?: boolean;
-    fixme?: string;
 };
 
 type RoadWithMilestones = {
@@ -40,16 +42,12 @@ type RoadWithMilestones = {
 };
 
 function getData() {
-    const query = `[out:json][timeout:25];
-area["name"="България"]->.searchArea;
-(
-rel[route=road][network="bg:motorway"](area.searchArea);
-  )->.rels;
-
-(.rels; >;)->.ways;
-.rels out body;
-.ways out body;`
-    return queryOverpass(query);
+    const query =
+        '(rel(area.searchArea)[network="bg:motorway"];)->.rels;'
+        + '(.rels; >;)->.ways;'
+        + '.rels out body;'
+        + '.ways out body;';
+    return queryOverpassWithCustomQuery(query);
 }
 
 function preprocessMilestones(milestones): Milestone[] {
@@ -60,50 +58,66 @@ function preprocessMilestones(milestones): Milestone[] {
             console.warn(`Milestone with id ${milestone.id} has invalid distance: ${milestone.tags.distance}`);
             return null;
         }
-        const distance = parseFloat(milestone.tags.distance);
         const coords = [milestone.lat, milestone.lon] as [number, number];
         const toReturn: Milestone = {
             osmType: milestone.type,
             osmIds: [milestone.id],
-            distance,
+            tags: {
+                distance: milestone.tags.distance,
+                double: false
+            },
             coords,
         };
         if (milestone.tags.fixme) {
-            toReturn.fixme = milestone.tags.fixme;
+            toReturn.tags.fixme = milestone.tags.fixme;
         }
         return toReturn;
     }).filter((v): v is Milestone => !!v);
 }
 
-function mergeCloseMilestones(milestones: Milestone[]) {
-    for (let i = 0; i < milestones.length - 1; i++) {
-        const current = milestones[i];
-        if (current.double) continue;
-        const first_occurance_index = milestones.findIndex((potential_match, j) =>
-            i != j && potential_match.distance === current.distance);
-        if (first_occurance_index !== -1) {
-            const match = milestones[first_occurance_index];
-            const coords1 = current.coords;
-            const coords2 = match.coords;
-            const distance_between = distance(coords1, coords2, {units: 'meters'});
-            if(distance_between > 100) continue;
+function getAllIndexes(arr, value, notIndex) {
+    const indexes = [];
+    for (let i = 0; i < arr.length; i++) {
+        if (i !== notIndex && arr[i].tags.distance === value) {
+            indexes.push(i);
+        }
+    }
+    return indexes.toReversed();
+}
 
-            match.double = true;
-            match.coords = [
+function mergeCloseMilestones(milestones: Milestone[]) {
+    milestoneLoop:
+    for (let i = milestones.length - 1; i >= 0; i--) {
+        const current = milestones[i];
+        if (current.tags.double) continue;
+        let indexes = getAllIndexes(milestones, current.tags.distance, i);
+        if (indexes.length === 0) {
+            current.tags.double = false;
+            continue;
+        }
+        for (const index of indexes) {
+            const potemtialMatch = milestones[index];
+            const coords1 = current.coords;
+            const coords2 = potemtialMatch.coords;
+            const distance_between = distance(coords1, coords2, {units: 'meters'});
+            if(distance_between > 100) {
+                console.warn(`Milestones with distance ${current.tags.distance} are too far apart: ${distance_between} meters`);
+                console.log(`Milestone 1: ${JSON.stringify(current)}`);
+                console.log(`Milestone 2: ${JSON.stringify(potemtialMatch)}`);
+                continue;
+            }
+
+            current.tags.double = true;
+            current.coords = [
                 (coords1[0] + coords2[0]) / 2,
                 (coords1[1] + coords2[1]) / 2
             ];
-            match.osmIds.push(current.osmIds[0]);
-            if (current.fixme && !match.fixme) {
-                match.fixme = current.fixme;
+            current.osmIds.push(current.osmIds[0]);
+            if (current.tags.fixme && potemtialMatch.tags.fixme && current.tags.fixme !== potemtialMatch.tags.fixme) {
+                current.tags.fixme = `${current.tags.fixme};${potemtialMatch.tags.fixme}`;
             }
-            if (current.fixme && match.fixme && current.fixme !== match.fixme) {
-                match.fixme = `${current.fixme};${match.fixme}`;
-            }
-            milestones.splice(i, 1);
-        }
-        else {
-            current.double = false;
+            milestones.splice(index, 1);
+            continue milestoneLoop;
         }
     }
 }
