@@ -44,7 +44,8 @@
             text: "Инструмент за сравнение на данните в OpenStreetMap и на данните от Регионален исторически музей - София.",
             link: "./rhm-sofia/"
         }
-    ]
+    ];
+    cards.sort((a, b) => (a.isNew === b.isNew) ? 0 : a.isNew ? -1 : 1);
 </script>
 
 <Title title={false} />
