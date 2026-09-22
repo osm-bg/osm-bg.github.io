@@ -28,18 +28,11 @@
 				<li class="nav-item">
 					<a class="nav-link" href="/">Начало</a>
 				</li>
-				<li class="nav-item dropdown">
-					<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-						Инструменти
-					</a>
-					<ul class="dropdown-menu">
-						<li><a class="dropdown-item" href="/qa/atp-osm/">ATP &lt;=&gt; OSM</a></li>
-						<li><a class="dropdown-item" href="/qa/motorway-milestones/">Километрични маркери</a></li>
-						<li><a class="dropdown-item" href="/qa/road-network/">Пътна мрежа</a></li>
-						<li><a class="dropdown-item" href="/qa/railway-network/">Железопътна мрежа</a></li>
-						<li><a class="dropdown-item" href="/qa/river-network/">Речна мрежа</a></li>
-						<li><a class="dropdown-item" href="/qa/waste-containers/">Контейнери</a></li>
-					</ul>
+				<li class="nav-item">
+					<a class="nav-link" href="/qa/">Инструменти за контрол на качеството</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="/tEdit/">tEdit</a>
 				</li>
 			</ul>
 		</div>
