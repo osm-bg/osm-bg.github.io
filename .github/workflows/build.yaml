@@ -30,7 +30,7 @@ jobs:
         with:
           name: milestones-data
           workflow: milestones.yaml
-          path: src/data/
+          path: src/data/milestones/
 
       - name: Download qa-road-network artifact
         uses: dawidd6/action-download-artifact@v21
