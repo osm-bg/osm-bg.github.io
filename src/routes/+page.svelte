@@ -11,6 +11,32 @@
         <div class="col-md-4 mb-4">
             <div class="card">
                 <div class="card-header">
+                    <h5 class="card-title">🔧 Инструменти за контрол на качеството</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Инструменти за контрол на качеството, който помагат за подобряване на данните в OpenStreetMap.</p>
+                </div>
+                <div class="card-footer">
+                    <a href="/qa/" class="btn btn-outline-primary">Към инструментите</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">📋 Табличен редактор</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Табличен редактор, който позволява лесно и бързо редактиране на данни в OpenStreetMap.</p>
+                </div>
+                <div class="card-footer">
+                    <a href="/tEdit/" class="btn btn-outline-primary">Към табличния редактор</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-header">
                     <h5 class="card-title">📝 Бележки на картата</h5>
                 </div>
                 <div class="card-body">
@@ -44,32 +70,6 @@
                 </div>
                 <div class="card-footer">
                     <a href="https://community.openstreetmap.org/c/communities/bg/75" class="btn btn-outline-primary" target="_blank">Виж дискусиите <i class="bi bi-box-arrow-up-right"></i></a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title">🔧 Инструменти за контрол на качеството</h5>
-                </div>
-                <div class="card-body">
-                    <p class="card-text">Инструменти за контрол на качеството, който помагат за подобряване на данните в OpenStreetMap.</p>
-                </div>
-                <div class="card-footer">
-                    <a href="/qa/" class="btn btn-outline-primary">Към инструментите</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title">📋 Табличен редактор</h5>
-                </div>
-                <div class="card-body">
-                    <p class="card-text">Табличен редактор, който позволява лесно и бързо редактиране на данни в OpenStreetMap.</p>
-                </div>
-                <div class="card-footer">
-                    <a href="/tEdit/" class="btn btn-outline-primary" >Очаквайте скоро</a>
                 </div>
             </div>
         </div>
