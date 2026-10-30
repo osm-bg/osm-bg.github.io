@@ -210,12 +210,9 @@
 		for (const el of elements) {
 			delete el.tags[key];
 		}
-		// Премахване и от активните колони
-		activeKeysText = activeKeys.filter((k) => k !== key).join(', ');
 	}
 
 	function removeKeyFromColumns(key: string) {
-		// Премахване от активните колони
 		activeKeysText = activeKeys.filter((k) => k !== key).join(', ');
 	}
 
