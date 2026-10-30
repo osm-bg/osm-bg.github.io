@@ -59,7 +59,6 @@
 				keysSet.add(key);
 			}
 		}
-		activeKeysText = '';
 	}
 
 	function handleUnlock() {
