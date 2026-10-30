@@ -214,6 +214,11 @@
 		activeKeysText = activeKeys.filter((k) => k !== key).join(', ');
 	}
 
+	function removeKeyFromColumns(key: string) {
+		// Премахване от активните колони
+		activeKeysText = activeKeys.filter((k) => k !== key).join(', ');
+	}
+
 	function transliterate(text: string) {
 		const cyrToLat = {
 			'а': 'a',
@@ -338,13 +343,22 @@
 							<th class="col-tag">
 								<div class="key-header">
 									<span>{key}</span>
-									<button
-										class="btn-danger"
-										onclick={() => removeKeyFromAll(key)}
-										title="Изтрий тага от всички"
-									>
-										✕
-									</button>
+									<div>
+										<button
+											class="btn-danger"
+											onclick={() => removeKeyFromAll(key)}
+											title="Изтрий тага от всички"
+										>
+											<i class="bi bi-trash"></i>
+										</button>
+										<button
+											class="btn-danger"
+											onclick={() => removeKeyFromColumns(key)}
+											title="Премахни колоната от таблицата (не изтрива тага от елементите)"
+										>
+											<i class="bi bi-x-lg"></i>
+										</button>
+									</div>
 								</div>
 							</th>
 						{/each}
