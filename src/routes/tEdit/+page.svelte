@@ -100,7 +100,15 @@
             return collectedValues.join(separator);
         });
 
-        // 2. Обработка на единични тагове: {ref}
+
+		// 2. Обработка на функции: {cyr2lat(tag)}
+		result = result.replace(/\{cyr2lat\(([^)]+)\)\}/g, (match, tag) => {
+			const trimmedTag = tag.trim();
+			const val = el.tags[trimmedTag];
+			return val ? transliterate(val) : '';
+		});
+
+        // 3. Обработка на единични тагове: {ref}
         result = result.replace(/\{([^}]+)\}/g, (match, key) => {
             const trimmedKey = key.trim();
             return el.tags[trimmedKey] ?? '';
@@ -173,7 +181,7 @@
 		if (allSame) {
 			return { displayVal: values[0], placeholder: '' };
 		}
-		return { displayVal: '', placeholder: '*' };
+		return { displayVal: '', placeholder: 'Множество стойности' };
 	}
 
 	function getUniqueValuesForKey(key: string): string[] {
@@ -204,6 +212,56 @@
 		}
 		// Премахване и от активните колони
 		activeKeysText = activeKeys.filter((k) => k !== key).join(', ');
+	}
+
+	function transliterate(text: string) {
+		const cyrToLat = {
+			'а': 'a',
+			'б': 'b',
+			'в': 'v',
+			'г': 'g',
+			'д': 'd',
+			'е': 'e',
+			'ж': 'zh',
+			'з': 'z',
+			'и': 'i',
+			'й': 'y',
+			'к': 'k',
+			'л': 'l',
+			'м': 'm',
+			'н': 'n',
+			'о': 'o',
+			'п': 'p',
+			'р': 'r',
+			'с': 's',
+			'т': 't',
+			'у': 'u',
+			'ф': 'f',
+			'х': 'h',
+			'ц': 'ts',
+			'ч': 'ch',
+			'ш': 'sh',
+			'щ': 'sht',
+			'ъ': 'a',
+			'ь': 'y',
+			'ю': 'yu',
+			'я': 'ya'
+		};
+
+		let output = '';
+		for (const char of text) {
+			const isUpper = char === char.toUpperCase();
+			const lowerChar = char.toLowerCase();
+			if (cyrToLat[lowerChar]) {
+				const latChar = cyrToLat[lowerChar];
+				output += isUpper ? latChar.charAt(0).toUpperCase() + latChar.slice(1) : latChar;
+			}
+			else {
+				output += char;
+				console.warn(`Няма съответствие за символ: ${char}`);
+			}
+		}
+		return output;
 	}
 </script>
 
