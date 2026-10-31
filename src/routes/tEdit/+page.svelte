@@ -385,6 +385,9 @@
 									onchange={(e) => updateAllForKey(key, e.currentTarget.value)}
 								/>
 								<datalist id="list-{key}">
+									{#if key.includes('name') && key.includes(':')}
+										<option value={`cyr2lat(${key.split(':')[0]})`}></option>
+									{/if}'}
 									{#each getUniqueValuesForKey(key) as opt}
 										<option value={opt}></option>
 									{/each}
