@@ -101,10 +101,14 @@
         });
 
 
-		// 2. Обработка на функции: {cyr2lat(tag)}
-		result = result.replace(/\{cyr2lat\(([^)]+)\)\}/g, (match, tag) => {
+		// 2. Обработка на функции: cyr2lat(tag)
+		result = result.replace(/cyr2lat\(([^)]+)\)/g, (match, tag) => {
 			const trimmedTag = tag.trim();
-			const val = el.tags[trimmedTag];
+			const val = el.tags[trimmedTag] ?? '';
+			if (/[0-9]+-[а-я]{1,2}/.test(val)) {
+				// 1-ва, 2-а ...
+				return '';
+			}
 			return val ? transliterate(val) : '';
 		});
 
@@ -297,7 +301,7 @@
 		<p>Полезни съвети:</p>
 		<ul>
 			<li>Използвайте "Промяна на всички (*)" за да промените стойността на всички елементи в дадена колона.</li>
-			<li>Използвайте "Транслитерация" за да преведете български букви в латиница <code>{'{'}cyr2lat(key){'}'}</code>.</li>
+			<li>Използвайте "Транслитерация" за да преведете български букви в латиница <code>cyr2lat(key)</code>.</li>
 		</ul>
 	</div>
 
