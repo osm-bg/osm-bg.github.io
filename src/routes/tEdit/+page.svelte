@@ -65,6 +65,10 @@
 		isLocked = false;
 	}
 
+	function hasTemplate(rawVal: string): boolean {
+		return rawVal.includes('{') || rawVal.includes('[') || rawVal.includes('cyr2lat(');
+	}
+
     function evaluateTemplate(template: string, el: ElementData): string {
         // 1. Обработка на масиви в квадратни скоби: [tag1, tag2; separator]
         let result = template.replace(/\[([^\]]+)\]/g, (match, content) => {
@@ -197,10 +201,11 @@
 	}
 
 	function updateAllForKey(key: string, rawVal: string) {
-        const hasTemplate = rawVal.includes('{') || rawVal.includes('[');
-
+		if (rawVal === '') {
+			return;
+		}
         for (const el of elements) {
-            const finalVal = hasTemplate ? evaluateTemplate(rawVal, el) : rawVal;
+            const finalVal = hasTemplate(rawVal) ? evaluateTemplate(rawVal, el) : rawVal;
 
             if (finalVal === '') {
                 delete el.tags[key];
@@ -413,7 +418,7 @@
                                             let val = e.currentTarget.value;
                                             
                                             // Проверяваме за {tag} или [tag1, tag2]
-                                            if (val.includes('{') || val.includes('[')) {
+                                            if (hasTemplate(val)) {
                                                 val = evaluateTemplate(val, el);
                                                 e.currentTarget.value = val;
                                             }
